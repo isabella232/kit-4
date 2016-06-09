@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>kit by InVisionApp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">kit</h1>
+      <h2 class="project-tagline">Kubernetes + Git</h2>
+      <a href="https://github.com/InVisionApp/kit" class="btn">View on GitHub</a>
+      <a href="https://github.com/InVisionApp/kit/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/InVisionApp/kit/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <p align="center">
+  <img src="https://github.com/InVisionApp/kit/raw/master/media/kit-logo-horz-sm.png">
+</p>
+
+<h1>
+<a id="kit" class="anchor" href="#kit" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>kit</h1>
+
+<p>The <code>kit</code> suite is a series of components that when used together can achieve a continuous deployment workflow for countless Kubernetes clusters. They can be used as npm modules to orchestrate your own pipeline or they can be easily integrated into a <a href="http://pages.codeship.com/docker">Codeship Docker</a> pipeline.</p>
+
+<p>It currently consist of 3 core components:</p>
+
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/InVisionApp/kit-image-deployer">kit-image-deployer</a></td>
+<td><a href="https://badge.fury.io/js/kit-image-deployer"><img src="https://badge.fury.io/js/kit-image-deployer.svg" alt="npm version"></a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/InVisionApp/kit-deploymentizer">kit-deploymentizer</a></td>
+<td><a href="https://badge.fury.io/js/kit-deploymentizer"><img src="https://badge.fury.io/js/kit-deploymentizer.svg" alt="npm version"></a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/InVisionApp/kit-deployer">kit-deployer</a></td>
+<td><a href="https://badge.fury.io/js/kit-deployer"><img src="https://badge.fury.io/js/kit-deployer.svg" alt="npm version"></a></td>
+</tr>
+</tbody>
+</table>
+
+<h2>
+<a id="flow-diagram" class="anchor" href="#flow-diagram" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Flow Diagram</h2>
+
+<p align="center">
+  <img src="https://github.com/InVisionApp/kit/raw/master/media/kit-flowchart.png">
+</p>
+
+<h2>
+<a id="goals" class="anchor" href="#goals" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Goals</h2>
+
+<h6>
+<a id="1-deployment-pipeline-is-simple-and-therefore-easy-to-maintain" class="anchor" href="#1-deployment-pipeline-is-simple-and-therefore-easy-to-maintain" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1. Deployment pipeline is simple and therefore easy to maintain**</h6>
+
+<p>This pipeline keeps things simple by utilizing a Docker powered pipeline that can used for builds and testing for deployments as well. By doing this, you avoid having to run external services (such as a central service that triggers deployments, Vault or Consul services for configuration management, authentication services, etc) to manage the deployments.</p>
+
+<h6>
+<a id="2-compatible-with-codeships-docker-pipeline-architecture" class="anchor" href="#2-compatible-with-codeships-docker-pipeline-architecture" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>2. Compatible with Codeship’s docker pipeline architecture</h6>
+
+<p>Entire workflow uses the power of Codeship's Docker pipeline for builds, testing and deployments.</p>
+
+<h6>
+<a id="3-dev-teams-handle-deployments-of-their-images-via-their-services-repository" class="anchor" href="#3-dev-teams-handle-deployments-of-their-images-via-their-services-repository" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3. Dev teams handle deployments of their images via their service’s repository</h6>
+
+<p>Developers simply open PRs for their code changes where Codeship will run the builds and tests to verify the changes. Once the build passes, the developer merges the PR into "master" (or any other deployable branch) and Codeship runs another build &amp; test to verify and finally commits newly created image tag to the deployments repository where it is then deployed to the cluster via Codeship.</p>
+
+<h6>
+<a id="4-updates-to-images-environment-variables-or-configurations-are-automatically-and-continuously-deployed" class="anchor" href="#4-updates-to-images-environment-variables-or-configurations-are-automatically-and-continuously-deployed" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>4. Updates to images, environment variables or configurations are automatically and continuously deployed</h6>
+
+<p>Whenever a service's code is changed, it goes through it's Codeship pipeline to generate a new image that is tagged and pushed to our registry. The tagged image is then committed to the deployments repository where all cluster configurations are stored which automatically triggers Codeship to generate the new deployment files and deploy them to all our clusters. This keeps the deployment's repository image tags in sync with the appropriate deployed image. Because environment configuration will be reusable across multiple clusters and instances of the application, it makes it incredibly easy to rotate keys by simply updating it in the repository in a single place and the auto deployment takes care of it from there.</p>
+
+<h6>
+<a id="5-be-able-to-handle-clusters-dynamically-being-added-and-removed" class="anchor" href="#5-be-able-to-handle-clusters-dynamically-being-added-and-removed" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>5. Be able to handle clusters dynamically being added and removed</h6>
+
+<p>Whenever system administrators (or other automated systems) create new clusters, they can add it to the Deployments repository. This will automatically trigger the Codeship deploy process for these clusters and thus any future updates to services and environment variables will get deployed to the new cluster.</p>
+
+<h6>
+<a id="6-support-deploying-to-multiple-namespaces-within-the-one-cluster" class="anchor" href="#6-support-deploying-to-multiple-namespaces-within-the-one-cluster" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>6. Support deploying to multiple namespaces within the one cluster</h6>
+
+<p>Again this would be configured within the Deployments repository so that the Codeship deploy step will know which namespaces the deployments go to across as many clusters as we desire.</p>
+
+<h6>
+<a id="7-retain-audit-trail-of-changes-to-all-deployments-across-all-clusters" class="anchor" href="#7-retain-audit-trail-of-changes-to-all-deployments-across-all-clusters" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>7. Retain audit trail of changes to all deployments across all clusters</h6>
+
+<p>Because this process is using git, you have full history of all commits that occur and by whom the commits were made.</p>
+
+<h6>
+<a id="8-ability-to-easily-rollback-any-changes-images-environment-configurations-etc" class="anchor" href="#8-ability-to-easily-rollback-any-changes-images-environment-configurations-etc" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>8. Ability to easily rollback any changes (images, environment, configurations, etc)</h6>
+
+<p>Rolling back is as easy as reverting a commit on the corresponding service repo or the deployments repository which will trigger the Codeship deploy process.</p>
+
+<h6>
+<a id="9-high-availability-as-to-avoid-a-single-point-of-failure-for-deployments" class="anchor" href="#9-high-availability-as-to-avoid-a-single-point-of-failure-for-deployments" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>9. High availability as to avoid a single point of failure for deployments</h6>
+
+<p>Although automatic deploys will be halted if Github or Codeship were inaccessible, it doesn't mean you can't deploy. As long as you have a mirror of the git repo on Codeship and system administrators have the Codeship AES key, you can manually perform deployments as needed.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/InVisionApp/kit">kit</a> is maintained by <a href="https://github.com/InVisionApp">InVisionApp</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
